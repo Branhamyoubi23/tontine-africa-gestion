@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DataTable from "@/components/common/DataTable";
 import { Button } from "@/components/ui/button";
@@ -105,13 +104,16 @@ const Cotisations = () => {
 
   const { toast } = useToast();
 
-  // Colonnes pour la table de cotisations
+  // Colonnes pour la table de cotisations - fixée pour TypeScript
   const columns = [
     {
       header: "Date",
       accessor: (item: Cotisation) => new Date(item.date).toLocaleDateString(),
     },
-    { header: "Membre", accessor: "nomMembre" },
+    { 
+      header: "Membre", 
+      accessor: (item: Cotisation) => item.nomMembre 
+    },
     {
       header: "Montant",
       accessor: (item: Cotisation) => `${item.montant.toLocaleString()} FCFA`,
@@ -183,11 +185,15 @@ const Cotisations = () => {
     };
   });
 
+  // Colonnes pour la table des totaux par membre - fixée pour TypeScript
   const totalParMembreColumns = [
-    { header: "Membre", accessor: "nom" },
+    { 
+      header: "Membre", 
+      accessor: (item: any) => item.nom
+    },
     { 
       header: "Nombre de cotisations", 
-      accessor: "nbCotisations",
+      accessor: (item: any) => item.nbCotisations,
       className: "text-center"
     },
     { 

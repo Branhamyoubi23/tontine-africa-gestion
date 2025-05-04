@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   Card, 
@@ -24,6 +23,23 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+// Define types for our data for better type safety
+interface Transaction {
+  id: number;
+  date: string;
+  type: string;
+  membre: string;
+  montant: number;
+}
+
+interface DebtMember {
+  id: number;
+  nom: string;
+  montantPret: number;
+  montantRembourse: number;
+  dateEcheance: string;
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -57,7 +73,7 @@ const Dashboard = () => {
   ];
 
   // Données simulées pour les dernières transactions
-  const dernieresTransactions = [
+  const dernieresTransactions: Transaction[] = [
     { id: 1, date: "2023-05-01", type: "Cotisation", membre: "Amadou Diallo", montant: 25000 },
     { id: 2, date: "2023-05-02", type: "Prêt", membre: "Fatou Ndiaye", montant: 100000 },
     { id: 3, date: "2023-05-03", type: "Remboursement", membre: "Ibrahim Sow", montant: 30000 },
@@ -66,7 +82,7 @@ const Dashboard = () => {
   ];
 
   // Données simulées pour les membres avec des prêts en cours
-  const membresEnDette = [
+  const membresEnDette: DebtMember[] = [
     { id: 1, nom: "Fatou Ndiaye", montantPret: 100000, montantRembourse: 30000, dateEcheance: "2023-07-02" },
     { id: 2, nom: "Moussa Diop", montantPret: 80000, montantRembourse: 20000, dateEcheance: "2023-06-15" },
     { id: 3, nom: "Aminata Ba", montantPret: 50000, montantRembourse: 0, dateEcheance: "2023-08-10" },
@@ -75,19 +91,19 @@ const Dashboard = () => {
   const transactionColumns = [
     { 
       header: "Date", 
-      accessor: (item: any) => new Date(item.date).toLocaleDateString() 
+      accessor: (item: Transaction) => new Date(item.date).toLocaleDateString() 
     },
     { 
       header: "Type", 
-      accessor: (item: any) => item.type
+      accessor: (item: Transaction) => item.type
     },
     { 
       header: "Membre", 
-      accessor: (item: any) => item.membre 
+      accessor: (item: Transaction) => item.membre 
     },
     { 
       header: "Montant", 
-      accessor: (item: any) => `${item.montant.toLocaleString()} FCFA`,
+      accessor: (item: Transaction) => `${item.montant.toLocaleString()} FCFA`,
       className: "text-right"
     },
   ];
@@ -95,26 +111,26 @@ const Dashboard = () => {
   const detteColumns = [
     { 
       header: "Membre", 
-      accessor: (item: any) => item.nom
+      accessor: (item: DebtMember) => item.nom
     },
     { 
       header: "Montant prêt", 
-      accessor: (item: any) => `${item.montantPret.toLocaleString()} FCFA`,
+      accessor: (item: DebtMember) => `${item.montantPret.toLocaleString()} FCFA`,
       className: "text-right"
     },
     { 
       header: "Remboursé", 
-      accessor: (item: any) => `${item.montantRembourse.toLocaleString()} FCFA`,
+      accessor: (item: DebtMember) => `${item.montantRembourse.toLocaleString()} FCFA`,
       className: "text-right"
     },
     { 
       header: "Reste", 
-      accessor: (item: any) => `${(item.montantPret - item.montantRembourse).toLocaleString()} FCFA`,
+      accessor: (item: DebtMember) => `${(item.montantPret - item.montantRembourse).toLocaleString()} FCFA`,
       className: "text-right font-semibold"
     },
     { 
       header: "Échéance", 
-      accessor: (item: any) => new Date(item.dateEcheance).toLocaleDateString()
+      accessor: (item: DebtMember) => new Date(item.dateEcheance).toLocaleDateString()
     },
   ];
 

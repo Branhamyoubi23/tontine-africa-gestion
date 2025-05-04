@@ -60,9 +60,18 @@ const Membres = () => {
 
   // Colonnes pour la table de membres
   const columns = [
-    { header: "Nom", accessor: "nom" },
-    { header: "Téléphone", accessor: "telephone" },
-    { header: "Adresse", accessor: "adresse" },
+    { 
+      header: "Nom", 
+      accessor: (item: Member) => item.nom 
+    },
+    { 
+      header: "Téléphone", 
+      accessor: (item: Member) => item.telephone 
+    },
+    { 
+      header: "Adresse", 
+      accessor: (item: Member) => item.adresse 
+    },
     {
       header: "Date d'adhésion",
       accessor: (item: Member) => new Date(item.dateAdhesion).toLocaleDateString(),

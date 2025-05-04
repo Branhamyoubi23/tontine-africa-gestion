@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DataTable from "@/components/common/DataTable";
 import { Button } from "@/components/ui/button";
@@ -152,7 +151,10 @@ const Prets = () => {
       header: "Date",
       accessor: (item: Pret) => new Date(item.dateDebut).toLocaleDateString(),
     },
-    { header: "Membre", accessor: "nomMembre" },
+    { 
+      header: "Membre", 
+      accessor: (item: Pret) => item.nomMembre
+    },
     {
       header: "Montant",
       accessor: (item: Pret) => `${item.montant.toLocaleString()} FCFA`,
@@ -179,7 +181,10 @@ const Prets = () => {
       header: "Date",
       accessor: (item: Remboursement) => new Date(item.date).toLocaleDateString(),
     },
-    { header: "Membre", accessor: "nomMembre" },
+    { 
+      header: "Membre", 
+      accessor: (item: Remboursement) => item.nomMembre
+    },
     {
       header: "Montant",
       accessor: (item: Remboursement) => `${item.montant.toLocaleString()} FCFA`,

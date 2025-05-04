@@ -26,6 +26,7 @@ type DataTableProps<T> = {
     delete?: (item: T) => void;
   };
   className?: string;
+  compact?: boolean; // Added the compact prop
 };
 
 function DataTable<T>({
@@ -34,6 +35,7 @@ function DataTable<T>({
   keyExtractor,
   actions,
   className,
+  compact = false, // Added with default value
 }: DataTableProps<T>) {
   return (
     <div className={`w-full overflow-auto ${className}`}>
@@ -41,7 +43,12 @@ function DataTable<T>({
         <TableHeader>
           <TableRow>
             {columns.map((column, index) => (
-              <TableHead key={index} className={column.className}>
+              <TableHead 
+                key={index} 
+                className={column.className}
+                // Make the header more compact for mobile
+                style={compact ? { padding: '0.5rem' } : undefined}
+              >
                 {column.header}
               </TableHead>
             ))}
@@ -62,7 +69,12 @@ function DataTable<T>({
             data.map((item) => (
               <TableRow key={keyExtractor(item)}>
                 {columns.map((column, columnIndex) => (
-                  <TableCell key={columnIndex} className={column.className}>
+                  <TableCell 
+                    key={columnIndex} 
+                    className={column.className}
+                    // Make the cells more compact for mobile
+                    style={compact ? { padding: '0.5rem' } : undefined}
+                  >
                     {typeof column.accessor === "function"
                       ? column.accessor(item)
                       : (item[column.accessor] as React.ReactNode)}
