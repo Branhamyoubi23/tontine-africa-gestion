@@ -23,9 +23,11 @@ import {
   ResponsiveContainer 
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // Données simulées pour le tableau de bord
   const stats = {
@@ -71,9 +73,18 @@ const Dashboard = () => {
   ];
 
   const transactionColumns = [
-    { header: "Date", accessor: (item: any) => new Date(item.date).toLocaleDateString() },
-    { header: "Type", accessor: "type" },
-    { header: "Membre", accessor: "membre" },
+    { 
+      header: "Date", 
+      accessor: (item: any) => new Date(item.date).toLocaleDateString() 
+    },
+    { 
+      header: "Type", 
+      accessor: (item: any) => item.type
+    },
+    { 
+      header: "Membre", 
+      accessor: (item: any) => item.membre 
+    },
     { 
       header: "Montant", 
       accessor: (item: any) => `${item.montant.toLocaleString()} FCFA`,
@@ -82,7 +93,10 @@ const Dashboard = () => {
   ];
 
   const detteColumns = [
-    { header: "Membre", accessor: "nom" },
+    { 
+      header: "Membre", 
+      accessor: (item: any) => item.nom
+    },
     { 
       header: "Montant prêt", 
       accessor: (item: any) => `${item.montantPret.toLocaleString()} FCFA`,
@@ -104,59 +118,67 @@ const Dashboard = () => {
     },
   ];
 
+  // Customize dashboard components based on screen size
+  const chartHeight = isMobile ? 200 : 300;
+  const pieSize = isMobile ? 60 : 80;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Tableau de bord</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Aperçu général de la gestion de votre tontine
         </p>
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
         <StatCard
           title="Membres"
           value={stats.totalMembres.toString()}
-          icon={<Users size={24} />}
+          icon={<Users size={isMobile ? 18 : 24} />}
         />
         <StatCard
           title="Total des cotisations"
           value={`${stats.totalCotisations.toLocaleString()} FCFA`}
-          icon={<CreditCard size={24} />}
+          icon={<CreditCard size={isMobile ? 18 : 24} />}
           trend={{ value: 12, isPositive: true }}
         />
         <StatCard
           title="Total des prêts"
           value={`${stats.totalPrets.toLocaleString()} FCFA`}
-          icon={<FileText size={24} />}
+          icon={<FileText size={isMobile ? 18 : 24} />}
         />
         <StatCard
-          title="Taux de remboursement"
+          title="Remboursement"
           value={`${Math.round((stats.totalRemboursements / stats.totalPrets) * 100)}%`}
-          icon={<FileText size={24} />}
+          icon={<FileText size={isMobile ? 18 : 24} />}
           trend={{ value: 5, isPositive: true }}
         />
       </div>
 
       {/* Graphiques */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Répartition des prêts</CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <Card className="overflow-hidden">
+          <CardHeader className="p-4">
+            <CardTitle className="text-base md:text-lg">Répartition des prêts</CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="p-2 md:p-4">
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <PieChart>
                 <Pie
                   data={pretData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  outerRadius={80}
+                  outerRadius={pieSize}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => 
+                    isMobile 
+                      ? `${(percent * 100).toFixed(0)}%`
+                      : `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
                 >
                   {pretData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -169,18 +191,20 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Cotisations mensuelles</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="p-4">
+            <CardTitle className="text-base md:text-lg">Cotisations mensuelles</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="p-2 md:p-4">
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <BarChart data={cotisationsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis />
+                <YAxis width={isMobile ? 40 : 60} tickFormatter={(value) => 
+                  isMobile ? `${value/1000}k` : `${value.toLocaleString()}`
+                } />
                 <Tooltip formatter={(value) => `${Number(value).toLocaleString()} FCFA`} />
-                <Legend />
+                {!isMobile && <Legend />}
                 <Bar dataKey="montant" name="Montant (FCFA)" fill="#1A365D" />
               </BarChart>
             </ResponsiveContainer>
@@ -189,29 +213,31 @@ const Dashboard = () => {
       </div>
 
       {/* Tableaux */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Dernières transactions</CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <Card className="overflow-hidden">
+          <CardHeader className="p-4">
+            <CardTitle className="text-base md:text-lg">Dernières transactions</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-2 md:p-4">
             <DataTable
               data={dernieresTransactions}
               columns={transactionColumns}
               keyExtractor={(item) => item.id}
+              compact={isMobile}
             />
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Prêts en cours</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="p-4">
+            <CardTitle className="text-base md:text-lg">Prêts en cours</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-2 md:p-4">
             <DataTable
               data={membresEnDette}
               columns={detteColumns}
               keyExtractor={(item) => item.id}
+              compact={isMobile}
             />
           </CardContent>
         </Card>
