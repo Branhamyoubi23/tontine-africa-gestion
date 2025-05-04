@@ -1,3 +1,4 @@
+
 import React from "react";
 import { 
   Card, 
@@ -22,7 +23,6 @@ import {
   ResponsiveContainer 
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 // Define types for our data for better type safety
 interface Transaction {
@@ -43,7 +43,6 @@ interface DebtMember {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
   // Données simulées pour le tableau de bord
   const stats = {
@@ -134,67 +133,59 @@ const Dashboard = () => {
     },
   ];
 
-  // Customize dashboard components based on screen size
-  const chartHeight = isMobile ? 200 : 300;
-  const pieSize = isMobile ? 60 : 80;
-
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Tableau de bord</h1>
-        <p className="text-sm md:text-base text-muted-foreground">
+        <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
+        <p className="text-muted-foreground">
           Aperçu général de la gestion de votre tontine
         </p>
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
+      <div className="grid grid-cols-4 gap-6">
         <StatCard
           title="Membres"
           value={stats.totalMembres.toString()}
-          icon={<Users size={isMobile ? 18 : 24} />}
+          icon={<Users size={24} />}
         />
         <StatCard
           title="Total des cotisations"
           value={`${stats.totalCotisations.toLocaleString()} FCFA`}
-          icon={<CreditCard size={isMobile ? 18 : 24} />}
+          icon={<CreditCard size={24} />}
           trend={{ value: 12, isPositive: true }}
         />
         <StatCard
           title="Total des prêts"
           value={`${stats.totalPrets.toLocaleString()} FCFA`}
-          icon={<FileText size={isMobile ? 18 : 24} />}
+          icon={<FileText size={24} />}
         />
         <StatCard
           title="Remboursement"
           value={`${Math.round((stats.totalRemboursements / stats.totalPrets) * 100)}%`}
-          icon={<FileText size={isMobile ? 18 : 24} />}
+          icon={<FileText size={24} />}
           trend={{ value: 5, isPositive: true }}
         />
       </div>
 
       {/* Graphiques */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-6">
         <Card className="overflow-hidden">
           <CardHeader className="p-4">
-            <CardTitle className="text-base md:text-lg">Répartition des prêts</CardTitle>
+            <CardTitle className="text-lg">Répartition des prêts</CardTitle>
           </CardHeader>
-          <CardContent className="p-2 md:p-4">
-            <ResponsiveContainer width="100%" height={chartHeight}>
+          <CardContent className="p-4">
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={pretData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  outerRadius={pieSize}
+                  outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => 
-                    isMobile 
-                      ? `${(percent * 100).toFixed(0)}%`
-                      : `${name}: ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
                   {pretData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -209,18 +200,16 @@ const Dashboard = () => {
 
         <Card className="overflow-hidden">
           <CardHeader className="p-4">
-            <CardTitle className="text-base md:text-lg">Cotisations mensuelles</CardTitle>
+            <CardTitle className="text-lg">Cotisations mensuelles</CardTitle>
           </CardHeader>
-          <CardContent className="p-2 md:p-4">
-            <ResponsiveContainer width="100%" height={chartHeight}>
+          <CardContent className="p-4">
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={cotisationsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis width={isMobile ? 40 : 60} tickFormatter={(value) => 
-                  isMobile ? `${value/1000}k` : `${value.toLocaleString()}`
-                } />
+                <YAxis tickFormatter={(value) => `${value.toLocaleString()}`} />
                 <Tooltip formatter={(value) => `${Number(value).toLocaleString()} FCFA`} />
-                {!isMobile && <Legend />}
+                <Legend />
                 <Bar dataKey="montant" name="Montant (FCFA)" fill="#1A365D" />
               </BarChart>
             </ResponsiveContainer>
@@ -229,31 +218,29 @@ const Dashboard = () => {
       </div>
 
       {/* Tableaux */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-6">
         <Card className="overflow-hidden">
           <CardHeader className="p-4">
-            <CardTitle className="text-base md:text-lg">Dernières transactions</CardTitle>
+            <CardTitle className="text-lg">Dernières transactions</CardTitle>
           </CardHeader>
-          <CardContent className="p-2 md:p-4">
+          <CardContent className="p-4">
             <DataTable
               data={dernieresTransactions}
               columns={transactionColumns}
               keyExtractor={(item) => item.id}
-              compact={isMobile}
             />
           </CardContent>
         </Card>
 
         <Card className="overflow-hidden">
           <CardHeader className="p-4">
-            <CardTitle className="text-base md:text-lg">Prêts en cours</CardTitle>
+            <CardTitle className="text-lg">Prêts en cours</CardTitle>
           </CardHeader>
-          <CardContent className="p-2 md:p-4">
+          <CardContent className="p-4">
             <DataTable
               data={membresEnDette}
               columns={detteColumns}
               keyExtractor={(item) => item.id}
-              compact={isMobile}
             />
           </CardContent>
         </Card>
